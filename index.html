@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Svg.js Rectangles with collision detection</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Include SVG.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.1.2/svg.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  
+  <div class="controls">
+    <label for="length">Length:</label>
+    <input type="number" id="length" placeholder="Enter length" min="1" />
+    
+    <label for="breadth">Breadth:</label>
+    <input type="number" id="breadth" placeholder="Enter breadth" min="1" />
+    
+    <button id="generateBtn">Generate Rectangle</button>
+  </div>
+
+  <div id="svgContainer"></div>
+</body>
+</html>
