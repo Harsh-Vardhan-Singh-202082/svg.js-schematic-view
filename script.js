@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const draw = SVG().addTo('#svgContainer').size(1000, 1000);
+  const draw = SVG().addTo('#svgContainer').size(1500, 1000);
   const rectangles = []; // List of rectangles and their data
   const groups = []; // Groups of connected rectangles
+  const connections = [];
 
   function createRectangle(length, breadth) {
     const rect = draw.rect(length, breadth).attr({
@@ -50,8 +51,49 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     return points.map(point =>
-      draw.circle(6).attr({ fill: 'green', cx: point.x, cy: point.y })
+      draw.circle(8).attr({ fill: 'green', cx: point.x, cy: point.y }).on('click', onMidpointClick)
     );
+  }
+
+  let selectedMidpoint = null;
+
+  function onMidpointClick(event) {
+    const clickedCircle = event.target.instance;
+
+    if (!selectedMidpoint) {
+      selectedMidpoint = clickedCircle;
+      clickedCircle.attr({ fill: 'yellow' });
+    } else if (selectedMidpoint !== clickedCircle) {
+      createConnectionLine(selectedMidpoint, clickedCircle);
+      selectedMidpoint.attr({ fill: 'green' });
+      selectedMidpoint = null;
+    }
+  }
+  
+  function createConnectionLine(midpoint1, midpoint2) {
+    const x1 = midpoint1.cx();
+    const y1 = midpoint1.cy();
+    const x2 = midpoint2.cx();
+    const y2 = midpoint2.cy();
+
+    // Draw the line as two segments: horizontal and vertical
+    const horizontalLine = draw.line(x1, y1, x2, y1).stroke({ color: 'black', width: 1 });
+    const verticalLine = draw.line(x2, y1, x2, y2).stroke({ color: 'black', width: 1 });
+
+    connections.push({ lines: [verticalLine, horizontalLine], midpoint1, midpoint2 });
+  }
+  
+  function updateConnections() {
+    connections.forEach(({ lines, midpoint1, midpoint2 }) => {
+      const x1 = midpoint1.cx();
+      const y1 = midpoint1.cy();
+      const x2 = midpoint2.cx();
+      const y2 = midpoint2.cy();
+
+      // Update the line segments
+      lines[0].plot(x1, y1, x2, y1); // Horizontal line
+      lines[1].plot(x2, y1, x2, y2); // Vertical line
+    });
   }
 
   function updateMidpoints(rect, midpoints) {
@@ -66,9 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
     midpoints.forEach((circle, index) => {
       circle.attr({ cx: newPositions[index].x, cy: newPositions[index].y });
     });
+    updateConnections();
   }
 
-function highlightCloseMidpoints(draggedMidpoints) {
+  function highlightCloseMidpoints(draggedMidpoints) {
     rectangles.forEach(({ midpoints }) => {
       midpoints.forEach(circle => circle.attr({ fill: 'green' })); // Reset all to green
     });
